@@ -185,8 +185,11 @@ def have_internet():
 def install_packages():
 
     packages = ['bind-utils',
+                'yum-utils',
                 'epel-release',
                 'gcc',
+                'gcc-c++',
+                'gcc-gfortran',
                 'git',
                 'hwloc',
                 'hwloc-devel',
@@ -215,8 +218,7 @@ def install_packages():
                 'vim',
                 'wget',
                 'tmux',
-                'pdsh',
-                'openmpi'
+                'pdsh'
                ]
 
     while subprocess.call(['yum', 'install', '-y'] + packages):
@@ -239,6 +241,23 @@ def install_packages():
 
 #END install_packages()
 
+def install_opm_packages():
+
+    packages = ['opm-simulators-openmpi-bin',
+                'opm-upscaling-devel',
+................'opm-simulators-bin',
+                'openmpi-devel'
+               ]
+
+    while subprocess.call(['yum-config-manager','-y','--add-repo', 'https://www.opm-project.org/package/opm.repo']):
+        print "yum failed to add opm repo. Trying again in 5 seconds"
+        time.sleep(5)
+
+    while subprocess.call(['yum', 'install', '-y'] + packages):
+        print "yum failed to install packages. Trying again in 5 seconds"
+        time.sleep(5)
+
+#END install_opm_packages()
 
 def setup_munge():
 
@@ -1029,6 +1048,7 @@ def main():
 
     add_slurm_user()
     install_packages()
+    install_opm_packages()
     setup_munge()
     setup_bash_profile()
 
